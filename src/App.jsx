@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Tiles from "./components/Tiles";
+import Score from "./components/Score";
 
 function App() {
   const [tiles, setTiles] = useState([
@@ -21,15 +22,28 @@ function App() {
     { id: 16, clicked: false, text: "😶" },
   ]);
 
+  const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+
   const handleChange = (id) => {
     const newTiles = tiles.map((tile) => {
-      if (tile.id === id) {
-        return { ...tiles, id, clicked: true };
+      if (tile.id === id && tile.clicked === false) {
+        setScore(score + 1);
+        return { ...tile, clicked: true };
+      } else if (tile.id === id && tile.clicked === true) {
+        setScore(0);
+        setHighScore(score);
+        handleReset();
       }
       return tile;
     });
-    handleRandom(newTiles);
+
     setTiles(newTiles);
+    handleRandom(newTiles);
+  };
+
+  const handleReset = () => {
+    tiles.forEach((tile) => (tile.clicked = false));
   };
 
   const handleRandom = (tiles) => {
@@ -38,10 +52,16 @@ function App() {
 
   return (
     <div className="container">
+      <Score score={score} highScore={highScore} />
       <div className="tiles">
         {tiles.map((tile) => {
           return (
-            <Tiles key={tile.id} text={tile.text} handleChange={handleChange} />
+            <Tiles
+              key={tile.id}
+              id={tile.id}
+              text={tile.text}
+              handleChange={handleChange}
+            />
           );
         })}
       </div>
